@@ -7,8 +7,9 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.13"
 
+audioop-lts = "^0.2.1"
 discord = "^2.3.2"
 python-dotenv = "^1.0.1"
 psutil = "^6.1.0"
