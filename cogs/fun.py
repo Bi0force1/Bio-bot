@@ -94,7 +94,7 @@ class Funny(commands.Cog):
 
     @client.command()
     async def goatcam(self, ctx):
-        response = [ "The Gavlebocken webcam is currently disabled, but will return in December." ]
+        response = [ "https://www.youtube.com/live/RXIsDUtQIhQ?si=DpZnY64FFOT1gnqu" ]
         await ctx.send(f"{(response)}")
 
 

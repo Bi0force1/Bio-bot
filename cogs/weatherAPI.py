@@ -113,6 +113,10 @@ class Weather2(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+class Weather(commands.Cog):
+    def __init__(self, client):
+        self.client = client
+
     @commands.command()
     async def weather2(self, ctx: commands.Context, city: str):
         geo_url = "http://api.openweathermap.org/geo/1.0/direct"
@@ -147,9 +151,8 @@ class Weather2(commands.Cog):
                         return
 
                     location = f"{geo_data[0]['name']}, {geo_data[0]['state']}" if 'state' in geo_data[0] else geo_data[0]['name']
-                    localtime = weather_data["dt"]
-                    temp_c = weather_data["main"]["temp"]
-                    temp_f = temp_c * 9/5 + 32
+                    temp_c = round(weather_data["main"]["temp"], 1)
+                    temp_f = round(temp_c * 9/5 + 32, 1)
                     humidity = weather_data["main"]["humidity"]
                     wind_speed = weather_data["wind"]["speed"]
                     condition = weather_data["weather"][0]["description"]
