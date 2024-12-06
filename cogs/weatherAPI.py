@@ -19,7 +19,7 @@ class Weather(commands.Cog):
 
     # Weather query and response
     @client.command()
-    async def weather(self, ctx: commands.Context, city: str):
+    async def weather(self, ctx: commands.Context, *, city: str):
 
         url = "http://api.weatherapi.com/v1/current.json"
         params = {
@@ -54,9 +54,9 @@ class Forecast(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    # Weather querry and response
+    # Weather query and response
     @client.command()
-    async def forecast(self, ctx: commands.Context, city: str):
+    async def forecast(self, ctx: commands.Context, *, city: str):
         url = "http://api.weatherapi.com/v1/forecast.json"
         params = {
             "key": WEATHER_KEY,
@@ -114,7 +114,7 @@ class Weather2(commands.Cog):
         self.client = client
 
     @commands.command()
-    async def weather2(self, ctx: commands.Context, city: str):
+    async def weather2(self, ctx: commands.Context, *, city: str):
         geo_url = "http://api.openweathermap.org/geo/1.0/direct"
         weather_url = "http://api.openweathermap.org/data/2.5/weather"
         params_geo = {
@@ -169,7 +169,7 @@ class Forecast2(commands.Cog):
         self.client = client
 
     @commands.command()
-    async def forecast2(self, ctx: commands.Context, city: str):
+    async def forecast2(self, ctx: commands.Context, *, city: str):
         geo_url = "http://api.openweathermap.org/geo/1.0/direct"
         forecast_url = "http://api.openweathermap.org/data/2.5/forecast"
         params_geo = {
