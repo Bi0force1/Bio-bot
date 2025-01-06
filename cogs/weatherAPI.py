@@ -17,108 +17,8 @@ class Weather(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    # Weather query and response
-    @client.command()
-    async def weather(self, ctx: commands.Context, *, city: str):
-
-        url = "http://api.weatherapi.com/v1/current.json"
-        params = {
-            "key": WEATHER_KEY,
-            "q": city
-        }
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, params=params) as res:
-                data = await res.json()
-                location = data["location"]["name"]
-                region = data["location"]["region"]
-                localtime = data["location"]["localtime"]
-                temp_c = data["current"]["temp_c"]
-                temp_f = data["current"]["temp_f"]
-                humidity = data["current"]["humidity"]
-                wind_kph = data["current"]["wind_kph"]
-                wind_mph = data["current"]["wind_mph"]
-                condition = data["current"]["condition"]["text"]
-                image_url = "http:" + data["current"]["condition"]["icon"]
-
-                embed = discord.Embed(title=f"The current weather for {location}, {region}", description=f"The condition in `{location}` is `{condition}` as of {localtime}", colour=discord.Color.from_rgb(83,195,190))
-                embed.add_field(name="Temperature", value=f"{temp_c} C°  |  {temp_f} F°")
-                embed.add_field(name="Humidity",value=f"{humidity}%")
-                embed.add_field(name="Wind",value=f"{wind_kph} kph | {wind_mph} mph")
-                embed.set_thumbnail(url=image_url)
-
-                await ctx.send(embed=embed)
-
-
-class Forecast(commands.Cog):
-    def __init__(self, client):
-        self.client = client
-
-    # Weather query and response
-    @client.command()
-    async def forecast(self, ctx: commands.Context, *, city: str):
-        url = "http://api.weatherapi.com/v1/forecast.json"
-        params = {
-            "key": WEATHER_KEY,
-            "q": city,
-            "days": 3
-        }
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, params=params) as res:
-                data = await res.json()
-
-                location = data["location"]["name"]
-                region = data["location"]["region"]
-                forecastday = data["forecast"]["forecastday"][0]
-                day = forecastday["date"]
-                maxtemp_c = forecastday["day"]["maxtemp_c"]
-                maxtemp_f = forecastday["day"]["maxtemp_f"]
-                mintemp_c = forecastday["day"]["mintemp_c"]
-                mintemp_f = forecastday["day"]["mintemp_f"]
-                rain = forecastday["day"]["daily_chance_of_rain"]
-                snow = forecastday["day"]["daily_chance_of_snow"]
-                forecastday2 = data["forecast"]["forecastday"][1]
-                day2 = forecastday2["date"]
-                maxtemp_c2 = forecastday2["day"]["maxtemp_c"]
-                maxtemp_f2 = forecastday2["day"]["maxtemp_f"]
-                mintemp_c2 = forecastday2["day"]["mintemp_c"]
-                mintemp_f2 = forecastday2["day"]["mintemp_f"]
-                rain2 = forecastday2["day"]["daily_chance_of_rain"]
-                snow2 = forecastday2["day"]["daily_chance_of_snow"]
-                forecastday3 = data["forecast"]["forecastday"][2]
-                day3 = forecastday3["date"]
-                maxtemp_c3 = forecastday3["day"]["maxtemp_c"]
-                maxtemp_f3 = forecastday3["day"]["maxtemp_f"]
-                mintemp_c3 = forecastday3["day"]["mintemp_c"]
-                mintemp_f3 = forecastday3["day"]["mintemp_f"]
-                rain3 = forecastday3["day"]["daily_chance_of_rain"]
-                snow3 = forecastday3["day"]["daily_chance_of_snow"]
-
-                embed = discord.Embed(title=f"{location}, {region}", colour=discord.Color.from_rgb(83,195,190))
-                
-                embed.add_field(name=" ", value=f"""**Date:** {day} \n **Low:** {mintemp_c} C° | {mintemp_f} F° \n **High:** {maxtemp_c} C° | {maxtemp_f} F°""", inline=True )
-                embed.add_field(name=" ",value=f"""Chance of Rain: {rain} % \n Chance of Snow: {snow} %""", inline=False)
-
-                embed.add_field(name=" ", value=f"""**Date:** {day2} \n **Low:** {mintemp_c2} C° | {mintemp_f2} F° \n **High:** {maxtemp_c2} C° | {maxtemp_f2} F°""", inline=True )
-                embed.add_field(name=" ",value=f"""Chance of Rain: {rain2} % \n Chance of Snow: {snow2} %""", inline=False)
-
-                embed.add_field(name=" ", value=f"""**Date:** {day3} \n **Low:** {mintemp_c3} C° | {mintemp_f3} F° \n **High:** {maxtemp_c3} C° | {maxtemp_f3} F°""", inline=True )
-                embed.add_field(name=" ",value=f"""Chance of Rain: {rain3} % \n Chance of Snow: {snow3} %""", inline=False)
-
-                await ctx.send(embed=embed)
-
-
-class Weather2(commands.Cog):
-    def __init__(self, client):
-        self.client = client
-
-class Weather(commands.Cog):
-    def __init__(self, client):
-        self.client = client
-
     @commands.command()
-    async def weather2(self, ctx: commands.Context, *, city: str):
+    async def weather(self, ctx: commands.Context, *, city: str):
         geo_url = "http://api.openweathermap.org/geo/1.0/direct"
         weather_url = "http://api.openweathermap.org/data/2.5/weather"
         params_geo = {
@@ -167,12 +67,12 @@ class Weather(commands.Cog):
                     await ctx.send(embed=embed)
 
 
-class Forecast2(commands.Cog):
+class Forecast(commands.Cog):
     def __init__(self, client):
         self.client = client
 
     @commands.command()
-    async def forecast2(self, ctx: commands.Context, *, city: str):
+    async def forecast(self, ctx: commands.Context, *, city: str):
         geo_url = "http://api.openweathermap.org/geo/1.0/direct"
         forecast_url = "http://api.openweathermap.org/data/2.5/forecast"
         params_geo = {
@@ -242,5 +142,4 @@ class Forecast2(commands.Cog):
 async def setup(client):
     await client.add_cog(Weather(client))
     await client.add_cog(Forecast(client))
-    await client.add_cog(Weather2(client))
-    await client.add_cog(Forecast2(client))
+
