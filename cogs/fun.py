@@ -3,16 +3,12 @@ import discord
 from discord.ext import commands
 import random
 
-# set common variables
-intents = discord.Intents.all()
-client = commands.Bot(command_prefix="!", intents=intents)
-
 class Funny(commands.Cog):
     def __init__(self, client):
         self.client = client
 
 # Water / Hydration
-    @client.command()
+    @commands.command()
     async def water(self, ctx):
         response = [ 
             "Hydrate before you Die-drate!!!",
@@ -26,7 +22,7 @@ class Funny(commands.Cog):
 
 
 # Goat Facts
-    @client.command()
+    @commands.command()
     async def goat(self, ctx):
         response = [         
             ("In 1966 the Gävlebocken was burned <a:gavlebocken_fire:1171975133603307570>"),
@@ -92,25 +88,25 @@ class Funny(commands.Cog):
         await ctx.send(f"{random.choice(response)}")
 
 
-    @client.command()
+    @commands.command()
     async def goatcam(self, ctx):
         response = [ "https://www.youtube.com/live/RXIsDUtQIhQ?si=DpZnY64FFOT1gnqu" ]
         await ctx.send(f"{(response)}")
 
 
-    @client.command()
+    @commands.command()
     async def ilyft(self, ctx):
         response = "You've got quite a nice set yourself!!!"
         await ctx.send(f"{(response)}")
 
 
-    @client.command()
+    @commands.command()
     async def coin(self, ctx: commands.Context):
         outcome = random.choice(["Heads", "Tails"])
         await ctx.send(f'{ctx.author.mention} flipped a coin and got **{outcome}**!')
 
 
-    @client.command(name='dice')
+    @commands.command(name='dice')
     async def dice(self, ctx, dice: str):
         try:
             rolls, limit = map(int, dice.split('d'))
@@ -122,6 +118,59 @@ class Funny(commands.Cog):
         total = sum(results)
         await ctx.send(f'{ctx.author.mention} rolled: {result_str}\nFor a total of: {total}')
 
+
+    @commands.command()
+    async def help_bot(self, ctx):
+        """Main help command - shows all available help categories"""
+        embed = discord.Embed(
+            title="🤖 Bio-bot Help Center",
+            description="Your friendly multi-purpose Discord bot for gaming communities and wellness!",
+            color=discord.Color.purple()
+        )
+        
+        # Add bot avatar/thumbnail if available
+        if self.client.user.avatar:
+            embed.set_thumbnail(url=self.client.user.avatar.url)
+        
+        embed.add_field(
+            name="🎮 **Server Monitoring**",
+            value="`!help_server` - Game server status and player counts",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="👥 **User Commands**",
+            value="`!help_user` - Role management and personal info commands",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="🛡️ **Admin Commands**",
+            value="`!help_admin` - Administrative functions (Admin only)",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="🎲 **Fun & Wellness**",
+            value="`!water` - Hydration reminders\n`!goat` - Random Gävlebocken facts\n`!goatcam` - Live goat cam\n`!weather <city>` - Weather information\n`!workout` - Random workout suggestions\n`!coin` - Flip a coin\n`!dice <#d#>` - Roll dice (e.g., !dice 2d6)",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="📊 **Quick Server Check**",
+            value="`!server` - See all running game servers right now",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="ℹ️ **About Bio-bot**",
+            value="🎯 Server monitoring for ARK, Palworld & Enshrouded\n💪 Health & wellness reminders\n🎭 Role management system\n🌤️ Weather updates\n🔒 Privacy-focused (sensitive data sent via DM)",
+            inline=False
+        )
+        
+        embed.set_footer(text="💡 Use the specific help commands above for detailed information about each category")
+        
+        await ctx.send(embed=embed)
 
 async def setup(client):
     await client.add_cog(Funny(client))

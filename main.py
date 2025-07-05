@@ -1,7 +1,6 @@
 # Import required libraries
 import discord
 from discord.ext import commands
-from discord.ui import Select
 import os
 import asyncio
 from dotenv import load_dotenv
@@ -34,4 +33,3 @@ async def main():
         await client.start(token)
 
 asyncio.run(main())
-client.run(token)

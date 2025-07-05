@@ -8,10 +8,6 @@ import os
 WEATHER_KEY = os.environ["WEATHER_KEY"]
 WEATHER_KEY2 = os.environ["WEATHER_KEY2"]
 
-# set common variables
-intents = discord.Intents.all()
-client = commands.Bot(command_prefix="!", intents=intents)
-
 
 class Weather(commands.Cog):
     def __init__(self, client):

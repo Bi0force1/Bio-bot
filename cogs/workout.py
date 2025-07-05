@@ -4,11 +4,6 @@ from discord.ext import commands
 import random
 
 
-# set common variables
-intents = discord.Intents.all()
-client = commands.Bot(command_prefix="!", intents=intents)
-
-
 reps = [
     ("[Burpees](https://i0.wp.com/joshuaspodek.com/wp-content/uploads/2012/12/burpees1.png?ssl=1)",),
     ("[Crunches - Lay Down](https://cdn.shopify.com/s/files/1/0982/0194/files/5bestworkouttodowithwaisttrainers_3.jpg?v=1642018436)",),
@@ -94,18 +89,6 @@ class Workout(commands.Cog):
                 response += f"\nExercise {i + 1}: {exercise[0]}\nTime: {time_value}\n"
 
         await ctx.author.send(response)
-
-
-@client.event
-async def on_ready():
-    print(f'Logged in as {client.user}')
-
-
-@client.command()
-async def randomize(ctx):
-    selected_answers = random.sample(reps, k=3)
-    response = "\n".join([f'Answer{i + 1}: {answer}' for i, answer in enumerate(selected_answers)])
-    await ctx.send(response)
 
 
 async def setup(client):
