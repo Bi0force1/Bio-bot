@@ -317,6 +317,59 @@ class Admin(commands.Cog):
         
         await ctx.send(embed=embed)
 
+    @commands.command()
+    async def help_bot(self, ctx):
+        """Main help command - shows all available help categories"""
+        embed = discord.Embed(
+            title="🤖 Bio-bot Help Center",
+            description="Your friendly multi-purpose Discord bot for gaming communities and wellness!",
+            color=discord.Color.purple()
+        )
+        
+        # Add bot avatar/thumbnail if available
+        if self.client.user.avatar:
+            embed.set_thumbnail(url=self.client.user.avatar.url)
+        
+        embed.add_field(
+            name="🎮 **Server Monitoring**",
+            value="`!help_server` - Game server status and player counts",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="👥 **User Commands**",
+            value="`!help_user` - Role management and personal info commands",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="🛡️ **Admin Commands**",
+            value="`!help_admin` - Administrative functions (Admin only)",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="🎲 **Fun & Wellness**",
+            value="`!water` - Hydration reminders\n`!goat` - Random Gävlebocken facts\n`!goatcam` - Live goat cam\n`!weather <city>` - Weather information\n`!workout` - Random workout suggestions\n`!coin` - Flip a coin\n`!dice <#d#>` - Roll dice (e.g., !dice 2d6)\n`!dnd_help` - D&D 5e character creator help",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="📊 **Quick Server Check**",
+            value="`!server` - See all running game servers right now",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="ℹ️ **About Bio-bot**",
+            value="🎯 Server monitoring for ARK, Palworld & Enshrouded\n💪 Health & wellness reminders\n🎭 Role management system\n🌤️ Weather updates\n🔒 Privacy-focused (sensitive data sent via DM)",
+            inline=False
+        )
+        
+        embed.set_footer(text="💡 Use the specific help commands above for detailed information about each category")
+        
+        await ctx.send(embed=embed)
+
 
 async def setup(client):
     await client.add_cog(Admin(client))
