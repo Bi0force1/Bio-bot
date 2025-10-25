@@ -118,8 +118,8 @@ class Weather(commands.Cog):
         cities = [
             "graz", "stuttgart", "gavle", "london", 
             "new york", "nashville", "port of spain", 
-            "chicago", "st louis", "fargo", "denver", 
-            "tucson", "los angeles", "vancouver"
+            "chicago", "champaign", "st louis", "fargo", "denver", 
+            "tucson", "burbank", "los angeles", "vancouver"
         ]
         
         spaces = "     "  # 5 spaces for formatting

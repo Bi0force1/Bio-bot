@@ -354,7 +354,7 @@ class Hosting(commands.Cog):
                 title=f"{server_name.title()} Server Status",
                 color=discord.Color.green()
             )
-            embed.add_field(name="Status", value="🟢 Online", inline=True)
+            embed.add_field(name="Status", value="Online", inline=True)
             embed.add_field(name="Players", value=f"{players}/{max_players}", inline=True)
             embed.add_field(name="Port", value=server_info["port"], inline=True)
             
@@ -375,30 +375,30 @@ class Hosting(commands.Cog):
     async def help_server(self, ctx):
         """Display help for server monitoring commands"""
         embed = discord.Embed(
-            title="🎮 Server Monitoring Commands",
+            title="Server Monitoring Commands",
             description="Commands for checking game server status and player counts",
             color=discord.Color.blue()
         )
         
         embed.add_field(
-            name="📊 `!server`",
+            name="`!server`",
             value="Shows all running game servers with player counts",
             inline=False
         )
         
         embed.add_field(
-            name="👥 `!players <server_name>`",
+            name="`!players <server_name>`",
             value="Get detailed information about a specific server\n**Available servers:** ark, palworld, enshrouded",
             inline=False
         )
         
         embed.add_field(
-            name="ℹ️ Examples",
+            name="Examples",
             value="`!server` - List all running servers\n`!players palworld` - Check Palworld server details",
             inline=False
         )
         
-        embed.set_footer(text="💡 Tip: Server queries may take a few seconds to complete")
+        embed.set_footer(text="Tip: Server queries may take a few seconds to complete")
         
         await ctx.send(embed=embed)
 

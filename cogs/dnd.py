@@ -52,11 +52,11 @@ class DnDCharacterCreator(commands.Cog):
         """List all available D&D races"""
         races_data = await self.fetch_api_data("/races")
         if not races_data:
-            await ctx.send("❌ Unable to fetch races data from the API.")
+            await ctx.send("Unable to fetch races data from the API.")
             return
 
         embed = discord.Embed(
-            title="🧙‍♂️ Available D&D 5e Races",
+            title="Available D&D 5e Races",
             description="Choose from these official races for your character:",
             color=discord.Color.gold()
         )
@@ -82,11 +82,11 @@ class DnDCharacterCreator(commands.Cog):
         """List all available D&D classes"""
         classes_data = await self.fetch_api_data("/classes")
         if not classes_data:
-            await ctx.send("❌ Unable to fetch classes data from the API.")
+            await ctx.send("Unable to fetch classes data from the API.")
             return
 
         embed = discord.Embed(
-            title="⚔️ Available D&D 5e Classes",
+            title="Available D&D 5e Classes",
             description="Choose from these official classes for your character:",
             color=discord.Color.red()
         )
@@ -112,11 +112,11 @@ class DnDCharacterCreator(commands.Cog):
         """Get detailed information about a specific race"""
         race_data = await self.fetch_api_data(f"/races/{race_name.lower().replace(' ', '-')}")
         if not race_data:
-            await ctx.send(f"❌ Race '{race_name}' not found. Use `!dnd_races` to see available races.")
+            await ctx.send(f"Race '{race_name}' not found. Use `!dnd_races` to see available races.")
             return
 
         embed = discord.Embed(
-            title=f"🧙‍♂️ {race_data['name']}",
+            title=f"{race_data['name']}",
             description="\n".join(race_data.get('desc', ['No description available.'])),
             color=discord.Color.gold()
         )
@@ -126,28 +126,28 @@ class DnDCharacterCreator(commands.Cog):
             asi_text = []
             for asi in race_data['ability_score_increases']:
                 asi_text.append(f"**{asi['ability_score']['name']}** +{asi['bonus']}")
-            embed.add_field(name="📊 Ability Score Increases", value="\n".join(asi_text), inline=True)
+            embed.add_field(name="Ability Score Increases", value="\n".join(asi_text), inline=True)
 
         # Size and Speed
-        embed.add_field(name="📏 Size", value=race_data.get('size', 'Unknown'), inline=True)
-        embed.add_field(name="🏃 Speed", value=f"{race_data.get('speed', 'Unknown')} ft", inline=True)
+        embed.add_field(name="Size", value=race_data.get('size', 'Unknown'), inline=True)
+        embed.add_field(name="Speed", value=f"{race_data.get('speed', 'Unknown')} ft", inline=True)
 
         # Languages
         if 'languages' in race_data and race_data['languages']:
             lang_text = [lang['name'] for lang in race_data['languages']]
-            embed.add_field(name="🗣️ Languages", value=", ".join(lang_text), inline=False)
+            embed.add_field(name="Languages", value=", ".join(lang_text), inline=False)
 
         # Traits
         if 'traits' in race_data and race_data['traits']:
             trait_text = [trait['name'] for trait in race_data['traits']]
             if len(", ".join(trait_text)) > 1024:
                 trait_text = trait_text[:5] + ["..."]
-            embed.add_field(name="✨ Racial Traits", value=", ".join(trait_text), inline=False)
+            embed.add_field(name="Racial Traits", value=", ".join(trait_text), inline=False)
 
         # Subraces
         if 'subraces' in race_data and race_data['subraces']:
             subrace_text = [subrace['name'] for subrace in race_data['subraces']]
-            embed.add_field(name="🌟 Subraces", value=", ".join(subrace_text), inline=False)
+            embed.add_field(name="Subraces", value=", ".join(subrace_text), inline=False)
 
         await ctx.send(embed=embed)
 
@@ -156,11 +156,11 @@ class DnDCharacterCreator(commands.Cog):
         """Get detailed information about a specific class"""
         class_data = await self.fetch_api_data(f"/classes/{class_name.lower().replace(' ', '-')}")
         if not class_data:
-            await ctx.send(f"❌ Class '{class_name}' not found. Use `!dnd_classes` to see available classes.")
+            await ctx.send(f"Class '{class_name}' not found. Use `!dnd_classes` to see available classes.")
             return
 
         embed = discord.Embed(
-            title=f"⚔️ {class_data['name']}",
+            title=f"{class_data['name']}",
             description=f"**Hit Die:** d{class_data.get('hit_die', 'Unknown')}",
             color=discord.Color.red()
         )
@@ -168,32 +168,32 @@ class DnDCharacterCreator(commands.Cog):
         # Primary Ability
         if 'primary_ability' in class_data and class_data['primary_ability']:
             primary_abilities = [ability['name'] for ability in class_data['primary_ability']]
-            embed.add_field(name="💪 Primary Ability", value=", ".join(primary_abilities), inline=True)
+            embed.add_field(name="Primary Ability", value=", ".join(primary_abilities), inline=True)
 
         # Saving Throw Proficiencies
         if 'saving_throws' in class_data and class_data['saving_throws']:
             saving_throws = [save['name'] for save in class_data['saving_throws']]
-            embed.add_field(name="🛡️ Saving Throws", value=", ".join(saving_throws), inline=True)
+            embed.add_field(name="Saving Throws", value=", ".join(saving_throws), inline=True)
 
         # Proficiencies (condensed)
         if 'proficiencies' in class_data and class_data['proficiencies']:
             prof_count = len(class_data['proficiencies'])
-            embed.add_field(name="🎯 Proficiencies", value=f"{prof_count} total proficiencies", inline=True)
+            embed.add_field(name="Proficiencies", value=f"{prof_count} total proficiencies", inline=True)
 
         # Starting Equipment
         if 'starting_equipment' in class_data and class_data['starting_equipment']:
             eq_count = len(class_data['starting_equipment'])
-            embed.add_field(name="🎒 Starting Equipment", value=f"{eq_count} starting items", inline=True)
+            embed.add_field(name="Starting Equipment", value=f"{eq_count} starting items", inline=True)
 
         # Spellcasting
         if 'spellcasting' in class_data:
             spell_ability = class_data['spellcasting'].get('spellcasting_ability', {}).get('name', 'Unknown')
-            embed.add_field(name="🔮 Spellcasting", value=f"Ability: {spell_ability}", inline=True)
+            embed.add_field(name="Spellcasting", value=f"Ability: {spell_ability}", inline=True)
 
         # Subclasses
         if 'subclasses' in class_data and class_data['subclasses']:
             subclass_count = len(class_data['subclasses'])
-            embed.add_field(name="🌟 Subclasses", value=f"{subclass_count} available subclasses", inline=True)
+            embed.add_field(name="Subclasses", value=f"{subclass_count} available subclasses", inline=True)
 
         embed.set_footer(text=f"Use !dnd_create to start creating a {class_data['name']} character!")
         await ctx.send(embed=embed)
@@ -207,7 +207,7 @@ class DnDCharacterCreator(commands.Cog):
         classes_data = await self.fetch_api_data("/classes")
         
         if not races_data or not classes_data:
-            await ctx.send("❌ Unable to fetch character data from the API.")
+            await ctx.send("Unable to fetch character data from the API.")
             return
 
         # Select race
@@ -215,7 +215,7 @@ class DnDCharacterCreator(commands.Cog):
             race_index = race_name.lower().replace(' ', '-')
             race_info = next((r for r in races_data["results"] if r["index"] == race_index), None)
             if not race_info:
-                await ctx.send(f"❌ Race '{race_name}' not found. Use `!dnd_races` to see available races.")
+                await ctx.send(f"Race '{race_name}' not found. Use `!dnd_races` to see available races.")
                 return
         else:
             race_info = random.choice(races_data["results"])
@@ -225,7 +225,7 @@ class DnDCharacterCreator(commands.Cog):
             class_index = class_name.lower().replace(' ', '-')
             class_info = next((c for c in classes_data["results"] if c["index"] == class_index), None)
             if not class_info:
-                await ctx.send(f"❌ Class '{class_name}' not found. Use `!dnd_classes` to see available classes.")
+                await ctx.send(f"Class '{class_name}' not found. Use `!dnd_classes` to see available classes.")
                 return
         else:
             class_info = random.choice(classes_data["results"])
@@ -258,7 +258,7 @@ class DnDCharacterCreator(commands.Cog):
 
         # Create character embed
         embed = discord.Embed(
-            title=f"🎲 {character_name}",
+            title=f"{character_name}",
             description=f"**Race:** {race_info['name']}\n**Class:** {class_info['name']}\n**Level:** 1",
             color=discord.Color.purple()
         )
@@ -274,7 +274,7 @@ class DnDCharacterCreator(commands.Cog):
             else:
                 ability_text.append(f"**{name}:** {final} ({modifier_str})")
 
-        embed.add_field(name="📊 Ability Scores", value="\n".join(ability_text), inline=True)
+        embed.add_field(name="Ability Scores", value="\n".join(ability_text), inline=True)
 
         # Character details
         details = []
@@ -285,21 +285,21 @@ class DnDCharacterCreator(commands.Cog):
         if class_details:
             details.append(f"**Hit Die:** d{class_details.get('hit_die', 8)}")
             
-        embed.add_field(name="📋 Details", value="\n".join(details), inline=True)
+        embed.add_field(name="Details", value="\n".join(details), inline=True)
 
         # HP Calculation (max at level 1)
         if class_details:
             hit_die = class_details.get('hit_die', 8)
             con_modifier = self.calculate_modifier(final_scores[2])  # CON is index 2
             hp = hit_die + con_modifier
-            embed.add_field(name="❤️ Hit Points", value=f"{max(1, hp)} HP", inline=True)
+            embed.add_field(name="Hit Points", value=f"{max(1, hp)} HP", inline=True)
 
         embed.set_footer(text="Character created! Use !dnd_race and !dnd_class for more details about your character's abilities.")
         
         # Send to user via DM for privacy
         try:
             await ctx.author.send(embed=embed)
-            await ctx.send(f"📬 {ctx.author.mention} Your D&D character has been sent to your DMs!")
+            await ctx.send(f"{ctx.author.mention} Your D&D character has been sent to your DMs!")
         except discord.Forbidden:
             await ctx.send(embed=embed)
 
@@ -315,7 +315,7 @@ class DnDCharacterCreator(commands.Cog):
         
         if method not in methods:
             embed = discord.Embed(
-                title="🎲 Ability Score Generation Methods",
+                title="Ability Score Generation Methods",
                 description="Choose a method to generate ability scores:",
                 color=discord.Color.blue()
             )
@@ -336,7 +336,7 @@ class DnDCharacterCreator(commands.Cog):
         ability_names = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
         
         embed = discord.Embed(
-            title=f"🎲 Ability Scores ({method.upper()})",
+            title=f"Ability Scores ({method.upper()})",
             color=discord.Color.blue()
         )
         
@@ -349,7 +349,7 @@ class DnDCharacterCreator(commands.Cog):
             total += score
         
         embed.add_field(name="Generated Scores", value="\n".join(score_text), inline=True)
-        embed.add_field(name="📈 Total", value=f"{total} points", inline=True)
+        embed.add_field(name="Total", value=f"{total} points", inline=True)
         
         if method == "4d6":
             embed.set_footer(text="These scores are rolled fresh each time! Assign them to abilities as you see fit.")
@@ -362,31 +362,31 @@ class DnDCharacterCreator(commands.Cog):
     async def dnd_help(self, ctx):
         """Show D&D character creator help"""
         embed = discord.Embed(
-            title="🐉 D&D 5e Character Creator Help",
+            title="D&D 5e Character Creator Help",
             description="Create amazing D&D characters using the official 5e API!",
             color=discord.Color.dark_purple()
         )
         
         embed.add_field(
-            name="📚 Browse Options",
+            name="Browse Options",
             value="`!dnd_races` - List all available races\n`!dnd_classes` - List all available classes\n`!dnd_race <name>` - Detailed race info\n`!dnd_class <name>` - Detailed class info",
             inline=False
         )
         
         embed.add_field(
-            name="🎲 Character Creation", 
+            name="Character Creation", 
             value="`!dnd_create` - Create random character\n`!dnd_create <race> <class>` - Create specific character\n`!dnd_create <race> <class> <name>` - Create named character",
             inline=False
         )
         
         embed.add_field(
-            name="📊 Ability Scores",
+            name="Ability Scores",
             value="`!dnd_rolls` - Show rolling methods\n`!dnd_rolls <method>` - Generate scores\nMethods: 4d6, standard, point, 3d6",
             inline=False
         )
         
         embed.add_field(
-            name="💡 Examples",
+            name="Examples",
             value="`!dnd_create elf wizard Gandalf`\n`!dnd_race dragonborn`\n`!dnd_rolls standard`",
             inline=False
         )

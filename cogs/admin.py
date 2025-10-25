@@ -85,11 +85,11 @@ class Admin(commands.Cog):
         
         # Check if the user has permission to view other members' server lists
         if member != ctx.author and not ctx.author.guild_permissions.administrator:
-            await ctx.send("❌ You need administrator permissions to check other members' server lists.")
+            await ctx.send("You need administrator permissions to check other members' server lists.")
             return
         
         # Send confirmation in channel that command was received
-        await ctx.send(f"📨 Sending server list for {member.display_name} via DM...")
+        await ctx.send(f"Sending server list for {member.display_name} via DM...")
         
         # Get all mutual guilds between the bot and the member
         mutual_guilds = []
@@ -99,9 +99,9 @@ class Admin(commands.Cog):
         
         if not mutual_guilds:
             try:
-                await ctx.author.send(f"❌ {member.display_name} is not in any servers that I can see.")
+                await ctx.author.send(f"{member.display_name} is not in any servers that I can see.")
             except discord.Forbidden:
-                await ctx.send("❌ I couldn't send you a DM. Please check your privacy settings.")
+                await ctx.send("I couldn't send you a DM. Please check your privacy settings.")
             return
         
         # Create embed
@@ -154,7 +154,7 @@ class Admin(commands.Cog):
         try:
             await ctx.author.send(embed=embed)
         except discord.Forbidden:
-            await ctx.send("❌ I couldn't send you a DM. Please check your privacy settings and try again.")
+            await ctx.send("I couldn't send you a DM. Please check your privacy settings and try again.")
 
     @commands.command()
     async def server_info(self, ctx, member: discord.Member = None):
@@ -164,11 +164,11 @@ class Admin(commands.Cog):
             
         # Check permissions for viewing other members
         if member != ctx.author and not ctx.author.guild_permissions.administrator:
-            await ctx.send("❌ You need administrator permissions to check other members' information.")
+            await ctx.send("You need administrator permissions to check other members' information.")
             return
         
         # Send confirmation in channel that command was received
-        await ctx.send(f"📨 Sending server info for {member.display_name} via DM...")
+        await ctx.send(f"Sending server info for {member.display_name} via DM...")
         
         embed = discord.Embed(
             title=f"Server Info for {member.display_name}",
@@ -192,128 +192,122 @@ class Admin(commands.Cog):
             embed.add_field(name=f"Roles ({len(roles)})", value=", ".join(roles), inline=False)
         
         # Status and activity
-        status_emoji = {
-            discord.Status.online: "🟢",
-            discord.Status.idle: "🟡", 
-            discord.Status.dnd: "🔴",
-            discord.Status.offline: "⚫"
-        }
-        embed.add_field(name="Status", value=f"{status_emoji.get(member.status, '❓')} {member.status.name.title()}", inline=True)
+        embed.add_field(name="Status", value=f"{member.status.name.title()}", inline=True)
         
         # Permissions check
         if member.guild_permissions.administrator:
-            embed.add_field(name="Permissions", value="🛡️ Administrator", inline=True)
+            embed.add_field(name="Permissions", value="Administrator", inline=True)
         elif member.guild_permissions.manage_guild:
-            embed.add_field(name="Permissions", value="⚙️ Manage Server", inline=True)
+            embed.add_field(name="Permissions", value="Manage Server", inline=True)
         elif member.guild_permissions.manage_messages:
-            embed.add_field(name="Permissions", value="🔧 Manage Messages", inline=True)
+            embed.add_field(name="Permissions", value="Manage Messages", inline=True)
         
         # Send via DM with error handling
         try:
             await ctx.author.send(embed=embed)
         except discord.Forbidden:
-            await ctx.send("❌ I couldn't send you a DM. Please check your privacy settings and try again.")
+            await ctx.send("I couldn't send you a DM. Please check your privacy settings and try again.")
 
     @commands.command()
     async def help_admin(self, ctx):
         """Display help for admin commands (admin only)"""
         if not ctx.author.guild_permissions.administrator:
-            await ctx.send("❌ This command is only available to administrators.")
+            await ctx.send("This command is only available to administrators.")
             return
             
         # Send confirmation in channel
-        await ctx.send("📨 Sending admin command help via DM...")
+        await ctx.send("Sending admin command help via DM...")
         
         embed = discord.Embed(
-            title="🛡️ Admin Commands",
+            title="Admin Commands",
             description="Administrative commands for server management (Admin Only)",
             color=discord.Color.red()
         )
         
         embed.add_field(
-            name="🔍 `!member_servers [member]`",
+            name="`!member_servers [member]`",
             value="List all servers that a member shares with the bot\n*Results sent via DM for privacy*",
             inline=False
         )
         
         embed.add_field(
-            name="📋 `!server_info [member]`", 
+            name="`!server_info [member]`", 
             value="Get detailed information about a member in the current server\n*Results sent via DM for privacy*",
             inline=False
         )
         
         embed.add_field(
-            name="🎭 `!group <keyword>`",
+            name="`!group <keyword>`",
             value="Toggle gaming group roles\n**Available:** juicers, shooters, pga, palworld",
             inline=False
         )
         
         embed.add_field(
-            name="🎨 `!color <color>`",
+            name="`!color <color>`",
             value="Assign color roles (removes existing color roles)\n**Available:** red, orange, yellow, green, blue, purple, pink, grey, black, white",
             inline=False
         )
         
         embed.add_field(
-            name="ℹ️ Examples",
+            name="Examples",
             value="`!member_servers @username` - Check user's servers\n`!server_info` - Your own server info\n`!group palworld` - Toggle Palworld role\n`!color blue` - Get blue color role",
             inline=False
         )
         
         embed.add_field(
-            name="🔒 Privacy Notes",
+            name="Privacy Notes",
             value="• Member information commands send results privately via DM\n• Only administrators can check other members' information\n• Users can always check their own information",
             inline=False
         )
         
-        embed.set_footer(text="🛡️ Administrator Commands • Results sent privately for security")
+        embed.set_footer(text="Administrator Commands • Results sent privately for security")
         
         # Send via DM with error handling
         try:
             await ctx.author.send(embed=embed)
         except discord.Forbidden:
-            await ctx.send("❌ I couldn't send you a DM. Please check your privacy settings and try again.")
+            await ctx.send("I couldn't send you a DM. Please check your privacy settings and try again.")
 
     @commands.command()
     async def help_user(self, ctx):
         """Display help for user commands available to everyone"""
         embed = discord.Embed(
-            title="👥 User Commands",
+            title="User Commands",
             description="Commands available to all server members",
             color=discord.Color.green()
         )
         
         embed.add_field(
-            name="🎭 `!group <keyword>`",
+            name="`!group <keyword>`",
             value="Toggle your gaming group roles\n**Available:** juicers, shooters, pga, palworld",
             inline=False
         )
         
         embed.add_field(
-            name="🎨 `!color <color>`",
+            name="`!color <color>`",
             value="Change your color role (removes existing color roles)\n**Available:** red, orange, yellow, green, blue, purple, pink, grey, black, white",
             inline=False
         )
         
         embed.add_field(
-            name="📋 `!server_info`",
+            name="`!server_info`",
             value="Get your own server information\n*Results sent via DM for privacy*",
             inline=False
         )
         
         embed.add_field(
-            name="🔍 `!member_servers`", 
+            name="`!member_servers`", 
             value="List all servers you share with the bot\n*Results sent via DM for privacy*",
             inline=False
         )
         
         embed.add_field(
-            name="ℹ️ Examples",
+            name="Examples",
             value="`!group palworld` - Join/leave Palworld group\n`!color blue` - Get blue color role\n`!server_info` - Check your server details",
             inline=False
         )
         
-        embed.set_footer(text="💡 Role changes are sent via DM • Use !help_server for game server commands")
+        embed.set_footer(text="Role changes are sent via DM • Use !help_server for game server commands")
         
         await ctx.send(embed=embed)
 
@@ -501,42 +495,42 @@ class Admin(commands.Cog):
             embed.set_thumbnail(url=self.client.user.avatar.url)
         
         embed.add_field(
-            name="🎮 **Server Monitoring**",
+            name="**Server Monitoring**",
             value="`!help_server` - Game server status and player counts",
             inline=False
         )
         
         embed.add_field(
-            name="👥 **User Commands**",
+            name="**User Commands**",
             value="`!help_user` - Role management and personal info commands",
             inline=False
         )
         
         embed.add_field(
-            name="🛡️ **Admin Commands**",
+            name="**Admin Commands**",
             value="`!help_admin` - Administrative functions (Admin only)",
             inline=False
         )
         
         embed.add_field(
-            name="🎲 **Fun & Wellness**",
+            name="**Fun & Wellness**",
             value="`!water` - Hydration reminders\n`!goat` - Random Gävlebocken facts\n`!goatcam` - Live goat cam\n`!weather <city>` - Weather information\n`!workout` - Random workout suggestions\n`!coin` - Flip a coin\n`!dice <#d#>` - Roll dice (e.g., !dice 2d6)\n`!dnd_help` - D&D 5e character creator help",
             inline=False
         )
         
         embed.add_field(
-            name="📊 **Quick Server Check**",
+            name="**Quick Server Check**",
             value="`!server` - See all running game servers right now",
             inline=False
         )
         
         embed.add_field(
-            name="ℹ️ **About Bio-bot**",
-            value="🎯 Server monitoring for ARK, Palworld & Enshrouded\n💪 Health & wellness reminders\n🎭 Role management system\n🌤️ Weather updates\n🔒 Privacy-focused (sensitive data sent via DM)",
+            name="**About Bio-bot**",
+            value="Server monitoring for ARK, Palworld & Enshrouded\nHealth & wellness reminders\nRole management system\nWeather updates\nPrivacy-focused (sensitive data sent via DM)",
             inline=False
         )
         
-        embed.set_footer(text="💡 Use the specific help commands above for detailed information about each category")
+        embed.set_footer(text="Use the specific help commands above for detailed information about each category")
         
         await ctx.send(embed=embed)
 
