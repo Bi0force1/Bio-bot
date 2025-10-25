@@ -46,21 +46,168 @@ class Weather(commands.Cog):
                         await ctx.send(f"Failed to retrieve weather data for {city}")
                         return
 
-                    location = f"{geo_data[0]['name']}, {geo_data[0]['state']}" if 'state' in geo_data[0] else geo_data[0]['name']
-                    temp_c = round(weather_data["main"]["temp"], 1)
-                    temp_f = round(temp_c * 9/5 + 32, 1)
+                    # Format location with city and abbreviated state/country
+                    city_name = geo_data[0]['name']
+                    if 'state' in geo_data[0] and geo_data[0]['state']:
+                        # For US cities, use abbreviated state
+                        state_abbrev = {
+                            'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
+                            'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
+                            'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
+                            'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
+                            'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
+                            'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+                            'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
+                            'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
+                            'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
+                            'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY',
+                            'District of Columbia': 'DC'
+                        }.get(geo_data[0]['state'], geo_data[0]['state'])
+                        location = f"{city_name}, {state_abbrev}"
+                    else:
+                        # For international cities, use abbreviated country
+                        country_code = geo_data[0]['country']
+                        country_abbrev = {
+                            'US': 'USA', 'CA': 'Can', 'GB': 'UK', 'AU': 'Aus',
+                            'DE': 'Ger', 'FR': 'Fra', 'IT': 'Ita', 'ES': 'Spa',
+                            'AT': 'Aut', 'CH': 'Swi', 'NL': 'Net', 'BE': 'Bel',
+                            'JP': 'Jpn', 'CN': 'Chn', 'IN': 'Ind', 'BR': 'Bra',
+                            'MX': 'Mex', 'RU': 'Rus', 'SE': 'Swe', 'NO': 'Nor',
+                            'DK': 'Den', 'FI': 'Fin', 'PL': 'Pol', 'CZ': 'Cze'
+                        }.get(country_code, country_code)
+                        location = f"{city_name}, {country_abbrev}"
+
+                    temp_c = round(weather_data["main"]["temp"])
+                    temp_f = round(temp_c * 9/5 + 32)
+                    feels_like_c = round(weather_data["main"]["feels_like"])
+                    feels_like_f = round(feels_like_c * 9/5 + 32)
                     humidity = weather_data["main"]["humidity"]
                     wind_speed = weather_data["wind"]["speed"]
                     condition = weather_data["weather"][0]["description"]
                     image_url = f"http://openweathermap.org/img/wn/{weather_data['weather'][0]['icon']}@2x.png"
 
-                    embed = discord.Embed(title=f"The current weather for {location}", description=f"The condition in `{location}` is `{condition}`.", colour=discord.Color.from_rgb(83, 195, 190))
-                    embed.add_field(name="Temperature", value=f"{temp_c} °C | {temp_f} °F")
-                    embed.add_field(name="Humidity", value=f"{humidity}%")
-                    embed.add_field(name="Wind Speed", value=f"{wind_speed} m/s")
+                    # Get precipitation probability if available
+                    precip_percent = 0
+                    if 'pop' in weather_data:
+                        precip_percent = round(weather_data['pop'] * 100)
+                    elif 'rain' in weather_data or 'snow' in weather_data:
+                        precip_percent = 100  # If there's active precipitation, assume 100%
+
+                    # Get local time from timezone offset
+                    import datetime
+                    timezone_offset = weather_data.get('timezone', 0)
+                    local_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=timezone_offset)
+                    time_str = local_time.strftime("%H:%M")
+
+                    embed = discord.Embed(colour=discord.Color(int("98FBCA", 16)))
+                    embed.add_field(name="", value=f"```ansi\n\u001b[0;36m\u001b[1mCurrently in {location}: {condition}\u001b[0m\n```", inline=False)
+
+                    # Use separate fields like the old code for better spacing
+                    embed.add_field(name="Temp", value=f"{temp_c}c / {temp_f}f", inline=True)
+                    embed.add_field(name="Precip", value=f"{precip_percent}%", inline=True)
+                    embed.add_field(name="Humidity", value=f"{humidity}%", inline=True)
+                    embed.add_field(name="Feels like", value=f"{feels_like_c}c / {feels_like_f}f", inline=True)
+                    embed.add_field(name="Wind", value=f"{wind_speed} m/s", inline=True)
+                    embed.add_field(name="Local time", value=f"{time_str}", inline=True)
                     embed.set_thumbnail(url=image_url)
 
                     await ctx.send(embed=embed)
+
+    @commands.command()
+    async def friends(self, ctx: commands.Context):
+        cities = [
+            "graz", "stuttgart", "gavle", "london", 
+            "new york", "nashville", "port of spain", 
+            "chicago", "st louis", "fargo", "denver", 
+            "tucson", "los angeles", "vancouver"
+        ]
+        
+        spaces = "     "  # 5 spaces for formatting
+        geo_url = "http://api.openweathermap.org/geo/1.0/direct"
+        weather_url = "http://api.openweathermap.org/data/2.5/weather"
+        
+        # Step 1: Make API calls and collect all data
+        city_results = {}
+        
+        async with aiohttp.ClientSession() as session:
+            for city in cities:
+                try:
+                    # Get coordinates
+                    params_geo = {"q": city, "limit": 1, "appid": WEATHER_KEY2}
+                    async with session.get(geo_url, params=params_geo) as res_geo:
+                        if res_geo.status != 200:
+                            continue
+                        geo_data = await res_geo.json()
+                        if not geo_data:
+                            continue
+
+                        lat = geo_data[0]['lat']
+                        lon = geo_data[0]['lon']
+
+                        # Get weather data
+                        params_weather = {
+                            "lat": lat, "lon": lon, "appid": WEATHER_KEY2, "units": "metric"
+                        }
+                        async with session.get(weather_url, params=params_weather) as res_weather:
+                            if res_weather.status != 200:
+                                continue
+                            weather_data = await res_weather.json()
+
+                            # Format location
+                            city_name = geo_data[0]['name']
+                            if 'state' in geo_data[0] and geo_data[0]['state']:
+                                state_abbrev = {
+                                    'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
+                                    'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
+                                    'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
+                                    'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
+                                    'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
+                                    'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+                                    'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
+                                    'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
+                                    'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
+                                    'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY',
+                                    'District of Columbia': 'DC'
+                                }.get(geo_data[0]['state'], geo_data[0]['state'])
+                                location = f"{city_name}, {state_abbrev}"
+                            else:
+                                country_code = geo_data[0]['country']
+                                country_abbrev = {
+                                    'US': 'USA', 'CA': 'Can', 'GB': 'UK', 'AU': 'Aus',
+                                    'DE': 'Ger', 'FR': 'Fra', 'IT': 'Ita', 'ES': 'Spa',
+                                    'AT': 'Aut', 'CH': 'Swi', 'NL': 'Net', 'BE': 'Bel',
+                                    'JP': 'Jpn', 'CN': 'Chn', 'IN': 'Ind', 'BR': 'Bra',
+                                    'MX': 'Mex', 'RU': 'Rus', 'SE': 'Swe', 'NO': 'Nor',
+                                    'DK': 'Den', 'FI': 'Fin', 'PL': 'Pol', 'CZ': 'Cze'
+                                }.get(country_code, country_code)
+                                location = f"{city_name}, {country_abbrev}"
+
+                            # Get weather info
+                            temp_c = round(weather_data["main"]["temp"])
+                            temp_f = round(temp_c * 9/5 + 32)
+                            condition = weather_data["weather"][0]["description"]
+
+                            # Get local time
+                            import datetime
+                            timezone_offset = weather_data.get('timezone', 0)
+                            local_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=timezone_offset)
+                            time_str = local_time.strftime("%H:%M")
+
+                            # Step 2: Store formatted result for this city
+                            city_results[location] = f"{time_str}{spaces}{temp_c}c / {temp_f}f{spaces}{condition}"
+
+                except Exception:
+                    continue
+        
+        # Step 3: Build embed with pre-formatted values
+        embed = discord.Embed(colour=discord.Color(int("98FBCA", 16)))
+        embed.add_field(name="", value=f"```ansi\n\u001b[0;36m\u001b[1mFriends Weather Overview\u001b[0m\n```", inline=False)
+        
+        # Add each city as separate fields with bold location names
+        for location, formatted_result in city_results.items():
+            embed.add_field(name=f"**{location}**", value=f"```\n{formatted_result}\n```", inline=False)
+        
+        await ctx.send(embed=embed)
 
 
 class Forecast(commands.Cog):
@@ -101,6 +248,37 @@ class Forecast(commands.Cog):
                         await ctx.send(f"Failed to retrieve forecast data for {city}")
                         return
 
+                    # Format location with city and abbreviated state/country
+                    city_name = geo_data[0]['name']
+                    if 'state' in geo_data[0] and geo_data[0]['state']:
+                        # For US cities, use abbreviated state
+                        state_abbrev = {
+                            'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
+                            'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
+                            'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
+                            'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
+                            'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
+                            'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+                            'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
+                            'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
+                            'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
+                            'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY',
+                            'District of Columbia': 'DC'
+                        }.get(geo_data[0]['state'], geo_data[0]['state'])
+                        location = f"{city_name}, {state_abbrev}"
+                    else:
+                        # For international cities, use abbreviated country
+                        country_code = geo_data[0]['country']
+                        country_abbrev = {
+                            'US': 'USA', 'CA': 'Can', 'GB': 'UK', 'AU': 'Aus',
+                            'DE': 'Ger', 'FR': 'Fra', 'IT': 'Ita', 'ES': 'Spa',
+                            'AT': 'Aut', 'CH': 'Swi', 'NL': 'Net', 'BE': 'Bel',
+                            'JP': 'Jpn', 'CN': 'Chn', 'IN': 'Ind', 'BR': 'Bra',
+                            'MX': 'Mex', 'RU': 'Rus', 'SE': 'Swe', 'NO': 'Nor',
+                            'DK': 'Den', 'FI': 'Fin', 'PL': 'Pol', 'CZ': 'Cze'
+                        }.get(country_code, country_code)
+                        location = f"{city_name}, {country_abbrev}"
+
                     daily_forecasts = {}
                     for forecast in forecast_data['list']:
                         date = forecast['dt_txt'].split(' ')[0]
@@ -113,22 +291,33 @@ class Forecast(commands.Cog):
                             daily_forecasts[date]['min'] = min(daily_forecasts[date]['min'], temp_min)
                             daily_forecasts[date]['pop'] = max(daily_forecasts[date]['pop'], forecast['pop'])  # Use max pop for chance of rain
 
-                    embed = discord.Embed(title=f"{city} 3-day Forecast", colour=discord.Color.from_rgb(83, 195, 190))
+                    embed = discord.Embed(colour=discord.Color(int("98FBCA", 16)))
+                    embed.add_field(name="", value=f"```ansi\n\u001b[0;36m\u001b[1mThe 3 day forecast for {location}\u001b[0m\n```", inline=False)
                     for i, (date, temps) in enumerate(daily_forecasts.items()):
                         if i >= 3:
                             break
-                        maxtemp_c = temps['max']
-                        mintemp_c = temps['min']
-                        maxtemp_f = maxtemp_c * 9/5 + 32
-                        mintemp_f = mintemp_c * 9/5 + 32
-                        rain = temps['pop'] * 100  # Probability of precipitation
+                        maxtemp_c = round(temps['max'])
+                        mintemp_c = round(temps['min'])
+                        maxtemp_f = round(maxtemp_c * 9/5 + 32)
+                        mintemp_f = round(mintemp_c * 9/5 + 32)
+                        precip_percent = round(temps['pop'] * 100)
+
                         # Retrieve condition and image_url for the first forecast entry of each day
                         condition = forecast_data['list'][i * 8]['weather'][0]['description']
                         image_url = f"http://openweathermap.org/img/wn/{forecast_data['list'][i * 8]['weather'][0]['icon']}@2x.png"
 
-                        embed.add_field(name=f"Date: {date}",
-                                        value=f"**Condition:** {condition}\n**Low:** {mintemp_c} °C | {mintemp_f} °F\n**High:** {maxtemp_c} °C | {maxtemp_f} °F\n**Chance of Rain:** {rain}%",
-                                        inline=False)
+                        # Format date nicely
+                        import datetime
+                        date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
+                        formatted_date = date_obj.strftime("%a, %b %d")
+
+                        # Use separate fields like the old code for better spacing
+                        embed.add_field(name=f"**{formatted_date}**", value="", inline=False)
+                        embed.add_field(name="", value="     High:   " + f"{maxtemp_c}c / {maxtemp_f}f", inline=False)
+                        embed.add_field(name="", value="     Low:   " + f"{mintemp_c}c / {mintemp_f}f", inline=False)
+                        embed.add_field(name="", value="     Cond:   " + f"{condition}", inline=False)
+                        embed.add_field(name="", value="     Precip:   " + f"{precip_percent}%", inline=False)
+
                         if i == 0:
                             embed.set_thumbnail(url=image_url)
 

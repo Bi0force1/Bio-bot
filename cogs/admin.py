@@ -7,23 +7,23 @@ import os
 
 
 role_name = {
-"juicers":int(os.environ["Juicers"]),
-"shooters":int(os.environ["Shooters"]),
-"pga":int(os.environ["pga"]),
-"palworld":int(os.environ["Palworld"])
+"juicers":int(os.getenv("Juicers", "0")),
+"shooters":int(os.getenv("Shooters", "0")),
+"pga":int(os.getenv("pga", "0")),
+"palworld":int(os.getenv("Palworld", "0"))
 }
 
 role_color = {
-"red":int(os.environ["red"]),
-"orange":int(os.environ["orange"]),
-"yellow":int(os.environ["yellow"]),
-"green":int(os.environ["green"]),
-"blue":int(os.environ["blue"]),
-"purple":int(os.environ["purple"]),
-"pink":int(os.environ["pink"]),
-"grey":int(os.environ["grey"]),
-"black":int(os.environ["black"]),
-"white":int(os.environ["white"])
+"red":int(os.getenv("red", "0")),
+"orange":int(os.getenv("orange", "0")),
+"yellow":int(os.getenv("yellow", "0")),
+"green":int(os.getenv("green", "0")),
+"blue":int(os.getenv("blue", "0")),
+"purple":int(os.getenv("purple", "0")),
+"pink":int(os.getenv("pink", "0")),
+"grey":int(os.getenv("grey", "0")),
+"black":int(os.getenv("black", "0")),
+"white":int(os.getenv("white", "0"))
 }
 
 
@@ -314,6 +314,176 @@ class Admin(commands.Cog):
         )
         
         embed.set_footer(text="💡 Role changes are sent via DM • Use !help_server for game server commands")
+        
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def bothelp(self, ctx):
+        """Unified help command - shows different commands based on admin status"""
+        is_admin = ctx.author.guild_permissions.administrator
+        
+        if is_admin:
+            # Admin view - shows all commands with examples
+            embed = discord.Embed(
+                title="Bio-bot Commands (Administrator)",
+                description="Complete command list with examples - Administrative privileges detected",
+                color=discord.Color.red()
+            )
+
+            # Add bot avatar/thumbnail if available
+            if self.client.user.avatar:
+                embed.set_thumbnail(url=self.client.user.avatar.url)
+
+            # Role Management Commands
+            embed.add_field(
+                name="**Role Management**",
+                value="`!group <keyword>` - Toggle gaming group roles\n"
+                      "**Example:** `!group palworld`\n"
+                      "**Available:** juicers, shooters, pga, palworld\n\n"
+                      "`!color <color>` - Assign color roles\n"
+                      "**Example:** `!color blue`\n"
+                      "**Available:** red, orange, yellow, green, blue, purple, pink, grey, black, white",
+                inline=False
+            )
+
+            # Admin-Only Commands
+            embed.add_field(
+                name="**Administrative Commands**",
+                value="`!member_servers [member]` - List all servers that a member shares with the bot\n"
+                      "**Example:** `!member_servers @username`\n\n"
+                      "`!server_info [member]` - Get detailed member information\n"
+                      "**Example:** `!server_info @username`",
+                inline=False
+            )
+
+            # Server Commands
+            embed.add_field(
+                name="**Server Monitoring**",
+                value="`!server` - See all running game servers\n"
+                      "`!players [server_name]` - Check player counts\n"
+                      "**Example:** `!players ark-server`",
+                inline=False
+            )
+
+            # Weather Commands
+            embed.add_field(
+                name="**Weather & Location**",
+                value="`!weather <city>` - Get weather information\n"
+                      "**Example:** `!weather London`\n\n"
+                      "`!forecast <city>` - Get weather forecast\n"
+                      "**Example:** `!forecast New York`\n\n"
+                      "`!friends` - Weather for friend locations",
+                inline=False
+            )
+
+            # Fun & Wellness Commands  
+            embed.add_field(
+                name="**Fun & Wellness**",
+                value="`!water` - Hydration reminders\n"
+                      "`!workout` - Random workout suggestions\n"
+                      "`!goat` - Random Gävlebocken facts\n"
+                      "`!goatcam` - Live goat cam\n"
+                      "`!coin` - Flip a coin\n"
+                      "`!dice <#d#>` - Roll dice\n"
+                      "**Example:** `!dice 2d6`",
+                inline=False
+            )
+
+            # D&D Commands
+            embed.add_field(
+                name="**D&D Commands**",
+                value="`!dnd_help` - D&D character creator help\n"
+                      "`!race` - Random character race\n"
+                      "`!class` - Random character class\n"
+                      "`!background` - Random character background\n"
+                      "`!stats` - Roll character stats\n"
+                      "`!character` - Generate full random character\n"
+                      "`!spell <level>` - Random spell by level",
+                inline=False
+            )
+
+            embed.set_footer(text="Administrator View • Privacy-focused (sensitive data sent via DM)")
+
+        else:
+            # User view - shows only commands they can use
+            embed = discord.Embed(
+                title="Bio-bot Commands (User)",
+                description="Available commands for all server members",
+                color=discord.Color.green()
+            )
+
+            # Add bot avatar/thumbnail if available
+            if self.client.user.avatar:
+                embed.set_thumbnail(url=self.client.user.avatar.url)
+
+            # Role Management Commands
+            embed.add_field(
+                name="**Role Management**",
+                value="`!group <keyword>` - Toggle your gaming group roles\n"
+                      "**Example:** `!group palworld`\n"
+                      "**Available:** juicers, shooters, pga, palworld\n\n"
+                      "`!color <color>` - Change your color role\n"
+                      "**Example:** `!color blue`\n"
+                      "**Available:** red, orange, yellow, green, blue, purple, pink, grey, black, white",
+                inline=False
+            )
+
+            # Personal Info Commands
+            embed.add_field(
+                name="**Personal Information**",
+                value="`!server_info` - Get your own server information\n"
+                      "`!member_servers` - List servers you share with the bot\n"
+                      "*Results sent via DM for privacy*",
+                inline=False
+            )
+
+            # Server Commands
+            embed.add_field(
+                name="**Server Monitoring**",
+                value="`!server` - See all running game servers\n"
+                      "`!players [server_name]` - Check player counts\n"
+                      "**Example:** `!players ark-server`",
+                inline=False
+            )
+
+            # Weather Commands
+            embed.add_field(
+                name="**Weather & Location**",
+                value="`!weather <city>` - Get weather information\n"
+                      "**Example:** `!weather London`\n\n"
+                      "`!forecast <city>` - Get weather forecast\n"
+                      "**Example:** `!forecast New York`\n\n"
+                      "`!friends` - Weather for friend locations",
+                inline=False
+            )
+
+            # Fun & Wellness Commands
+            embed.add_field(
+                name="**Fun & Wellness**",
+                value="`!water` - Hydration reminders\n"
+                      "`!workout` - Random workout suggestions\n"
+                      "`!goat` - Random Gävlebocken facts\n"
+                      "`!goatcam` - Live goat cam\n"
+                      "`!coin` - Flip a coin\n"
+                      "`!dice <#d#>` - Roll dice\n"
+                      "**Example:** `!dice 2d6`",
+                inline=False
+            )
+
+            # D&D Commands
+            embed.add_field(
+                name="**D&D Commands**",
+                value="`!dnd_help` - D&D character creator help\n"
+                      "`!race` - Random character race\n"
+                      "`!class` - Random character class\n"
+                      "`!background` - Random character background\n"
+                      "`!stats` - Roll character stats\n"
+                      "`!character` - Generate full random character\n"
+                      "`!spell <level>` - Random spell by level",
+                inline=False
+            )
+
+            embed.set_footer(text="Role changes are sent via DM • Commands show examples for easy use")
         
         await ctx.send(embed=embed)
 
